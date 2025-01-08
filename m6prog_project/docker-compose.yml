@@ -1,49 +1,47 @@
-services:
+version: '3.9'
 
-# PHP FPM Service
+# Services
+services:
+ # PHP FPM Service
   php:
     image: wodby/php:latest
     volumes:
       - './:/var/www/html'
     depends_on:
       - mariadb
-
-       # Nginx Service
+# Nginx Service
   nginx:
     image: nginx:latest
     ports:
       - 88:80
     links:
-      - php
+      - 'php'
     volumes:
       - './:/var/www/html'
       - './docker/nginx:/etc/nginx/conf.d'
     depends_on:
       - php
-
-
-        # MariaDB Service
+  # MariaDB Service
   mariadb:
-    image: mariadb:latest
+    image: mysql:latest
     environment:
-      MYSQL_DATABASE: '${DB_SCHEMA}'
-      MYSQL_USER: '${DB_USER}'
-      MYSQL_PASSWORD: '${DB_PASSWORD}'
-      MYSQL_ROOT_PASSWORD: '${DB_ROOT_PASSWORD}'
+      MYSQL_DATABASE: weerdatabase
+      MYSQL_USER: rayan
+      MYSQL_PASSWORD: dhbfgaiufbuiahf
+      MYSQL_ROOT_PASSWORD: 2hifgi2ghfiu2hg
     ports:
       - 3308:3306
 
-
-        # phpmyadmin in an external image
+  # php myadmin in an external image
   phpmyadmin:
-    image: phpmyadmin:latest
+    image: phpmyadmin/phpmyadmin
     environment:
-      PMA_HOST: '${DB_HOST}'
-      PMA_USER: '${DB_USER}'
-      PMA_PASSWORD: '${DB_PASSWORD}'
+      PMA_HOST: mariadb
+      PMA_USER: rayan
+      PMA_PASSWORD: dhbfgaiufbuiahf
     ports:
       - "1088:80"
 
-
-
-      
+# Volumes
+volumes:
+  mysqldata:
