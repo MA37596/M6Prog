@@ -3,12 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NAW Formulier</title>
+    <title>NAW Gegevens Opslaan</title>
+
 </head>
 <body>
-    <h1>NAW Gegevens</h1>
+    <h1>Ontvangen NAW Gegevens</h1>
     <form action="/nawOpslaan.php" method="post">
-        <label for="naam">Naam:</label>
+        <label for="naam"><b>Naam:</b></label>
         <input type="text" id="naam" name="naam" value="" required><br><br>
 
         <label for="straat">Straat:</label>
@@ -25,5 +26,6 @@
 
         <input type="submit" value="Verzenden">
     </form>
+ 
 </body>
 </html>
