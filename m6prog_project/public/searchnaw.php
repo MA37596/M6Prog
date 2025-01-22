@@ -55,7 +55,6 @@ $searchInput = "leraar1";
 $searchResults = FindPersoon($conn,$searchInput);
 $conn->close();
 
-echo json_encode($searchResults);
 
 
 
@@ -64,5 +63,5 @@ $conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_SCHEMA);
 $searchResults= FindPersoon($conn,$searchInput);
 $conn->close();
 
-
-
+header('Content-Type: application/json; charset=utf-8');
+echo json_encode($searchResults);
