@@ -64,5 +64,5 @@ $conn = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_SCHEMA);
 $searchResults= FindPersoon($conn,$searchInput);
 $conn->close();
 
-header('Content-Type: application/json; charset=utf-8');
+
 
