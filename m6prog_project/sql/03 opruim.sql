@@ -1,0 +1,1 @@
+DELETE FROM PhotoMetadata WHERE `upload_date` < CURDATE()-30;
