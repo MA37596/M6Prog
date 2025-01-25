@@ -1,10 +1,11 @@
 <?php
-require_once '../source/config.php';
-require_once SOURCE_ROOT . 'database.php';
+require_once '../source/config.php'; 
+require_once SOURCE_ROOT . 'database.php'; 
 
 $response = [
     "succeeded" => false,
-    "message" => ""
+    "message" => "",
+    "fileName" => ""
 ];
 
 if ($_FILES["image"]["error"] !== UPLOAD_ERR_OK) {
@@ -14,11 +15,9 @@ if ($_FILES["image"]["error"] !== UPLOAD_ERR_OK) {
 }
 
 if (is_uploaded_file($_FILES["image"]["tmp_name"])) {
-    // Haal de bestandsnaam en extensie op
     $fileInfo = pathinfo($_FILES["image"]["name"]);
     $ext = strtolower($fileInfo["extension"]);
-    
-    // Controleer of het bestand een toegestane extensie heeft (optioneel)
+
     $allowedExtensions = ["jpg", "jpeg", "png", "gif"];
     if (!in_array($ext, $allowedExtensions)) {
         $response["message"] = "Ongeldig bestandstype. Alleen jpg, jpeg, png, en gif zijn toegestaan.";
@@ -26,16 +25,23 @@ if (is_uploaded_file($_FILES["image"]["tmp_name"])) {
         exit;
     }
 
-    // Genereer een unieke naam voor het bestand
     $uniqueId = uniqid("image_", true);
     $newFileName = $uniqueId . "." . $ext;
     $uploadPath = "../uploads/" . $newFileName;
 
-    // Verplaats het bestand naar de uploads-map
     if (move_uploaded_file($_FILES["image"]["tmp_name"], $uploadPath)) {
         $response["succeeded"] = true;
         $response["message"] = "Bestand succesvol geüpload!";
         $response["fileName"] = $newFileName;
+
+        $type = mime_content_type($uploadPath); 
+        $size = filesize($uploadPath); 
+
+        if (insertImageInDb($type, $size, $newFileName)) {
+            $response["message"] .= " En opgeslagen in de database!";
+        } else {
+            $response["message"] .= " Maar er ging iets mis bij het opslaan in de database.";
+        }
     } else {
         $response["message"] = "Fout bij het verplaatsen van het bestand.";
     }
@@ -45,28 +51,23 @@ if (is_uploaded_file($_FILES["image"]["tmp_name"])) {
 
 echo json_encode($response);
 
+function insertImageInDb($type, $size, $filename) {
+    $link = database_connect();
 
+    $sql = "INSERT INTO images (type, size, filename) VALUES (?, ?, ?)";
 
+    $stmt = $link->prepare($sql);
 
+    if (!$stmt) {
+        return false;
+    }
 
+    $stmt->bind_param("sis", $type, $size, $filename);
 
+    $success = $stmt->execute();
 
+    $stmt->close();
+    $link->close();
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return $success;
+}
