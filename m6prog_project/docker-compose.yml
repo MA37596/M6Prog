@@ -7,6 +7,7 @@ services:
     image: wodby/php:latest
     volumes:
       - './:/var/www/html'
+
     depends_on:
       - mariadb
 # Nginx Service
@@ -14,11 +15,14 @@ services:
     image: nginx:latest
     ports:
       - 88:80
+      - 881:443
     links:
       - 'php'
     volumes:
       - './:/var/www/html'
       - './docker/nginx:/etc/nginx/conf.d'
+      - './docker/nginxcert/cert.crt:/etc/nginx/cert.crt'
+      - './docker/nginxcert/cert.key:/etc/nginx/cert.key'
     depends_on:
       - php
   # MariaDB Service
