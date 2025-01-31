@@ -5,7 +5,8 @@ require_once SOURCE_ROOT . 'database.php';
 $response = [
     "succeeded" => false,
     "message" => "",
-    "fileName" => ""
+    "fileName" => "",
+    "downloadLink" => ""
 ];
 
 if ($_FILES["image"]["error"] !== UPLOAD_ERR_OK) {
@@ -34,10 +35,14 @@ if (is_uploaded_file($_FILES["image"]["tmp_name"])) {
         $response["message"] = "Bestand succesvol geüpload!";
         $response["fileName"] = $newFileName;
 
+        // Maak de downloadlink
+        $response["downloadLink"] = "http://localhost:88/uploads/" . $newFileName;
+
         $type = mime_content_type($uploadPath); 
         $size = filesize($uploadPath); 
 
-        if (insertImageInDb($type, $size, $newFileName)) {
+        // Sla het bestand op in de database
+        if (insertImageInDb($type, $size, $newFileName, $uploadPath)) {
             $response["message"] .= " En opgeslagen in de database!";
         } else {
             $response["message"] .= " Maar er ging iets mis bij het opslaan in de database.";
@@ -51,10 +56,11 @@ if (is_uploaded_file($_FILES["image"]["tmp_name"])) {
 
 echo json_encode($response);
 
-function insertImageInDb($type, $size, $filename) {
+// Functie om het bestand in de database op te slaan
+function insertImageInDb($type, $size, $filename, $path) {
     $link = database_connect();
 
-    $sql = "INSERT INTO images (type, size, filename) VALUES (?, ?, ?)";
+    $sql = "INSERT INTO images (type, size, filename, path) VALUES (?, ?, ?, ?)";
 
     $stmt = $link->prepare($sql);
 
@@ -62,7 +68,7 @@ function insertImageInDb($type, $size, $filename) {
         return false;
     }
 
-    $stmt->bind_param("sis", $type, $size, $filename);
+    $stmt->bind_param("siss", $type, $size, $filename, $path);
 
     $success = $stmt->execute();
 

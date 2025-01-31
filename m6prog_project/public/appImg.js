@@ -3,48 +3,47 @@ function FormToDictionary(form) {
     return new FormData(form); // FormData bevat ook bestand-invoer
 }
 
-// Selecteer het formulier met ID "imageForm"
-const imageForm = document.getElementById("imageForm");
+// Selecteer het bestand invoerveld en de anchor link
+const imageInput = document.getElementById("image");
+const link = document.getElementById("link");
+const imageForm = document.getElementById("imageform");
 
-// Functie om de afbeelding te posten
-function postImage(event) {
-    event.preventDefault(); // Voorkom standaardformulierverzending
 
-    console.log("Afbeelding wordt verzonden!");
 
-    // Haal de data van het formulier op als FormData
-    const formData = FormToDictionary(event.target);
+function showlink(fileName) {
+    link.style.display = "inline";
 
-    // Opties voor de fetch-aanroep
+    link.textContent = `Download het bestand: ${fileName}`;
+
+    link.setAttribute("href", `/uploads/${fileName}`);
+}
+
+imageForm.addEventListener("submit", function (event) {
+    event.preventDefault(); // Voorkom de standaardformulierverzending
+
+    const formData = new FormData(imageForm); // Haal alle formdata op
+
     const options = {
         method: "POST",
-        body: formData, // Verzend het FormData-object
+        body: formData,
     };
 
-    // Verstuur de fetch-aanroep naar imagereceive.php
     fetch("imagereceive.php", options)
         .then((response) => {
             if (!response.ok) {
                 throw new Error(`Server fout: ${response.statusText}`);
             }
-            return response.json(); // Verwacht een JSON-response van de server
+            return response.json();
         })
         .then((result) => {
             if (result.succeeded) {
-                console.log(`Bestand succesvol geüpload! Naam: ${result.fileName}`);
-                alert(`Succes! Bestand geüpload: ${result.fileName}`);
+                alert("Bestand succesvol geüpload!");
+                showlink(result.fileName);
             } else {
-                console.error("Servermelding:", result.message);
                 alert(`Fout: ${result.message}`);
             }
         })
         .catch((error) => {
-            console.error("Fout bij het verzenden van de afbeelding:", error);
-            alert("Er is een fout opgetreden bij het uploaden. Controleer de console voor details.");
+            alert("Er is een fout opgetreden bij het uploaden.");
         });
-}
-
-// Voeg een event listener toe aan het formulier
-if (imageForm) {
-    imageForm.addEventListener("submit", postImage);
-}
+});

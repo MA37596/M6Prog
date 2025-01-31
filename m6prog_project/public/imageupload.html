@@ -6,12 +6,15 @@
     <title>Document</title>
 </head>
 <body>
-    <form id="imageform" enctype="multipart/form-data" action="imagereceive.php" method="post">
+    <form id="imageform" enctype="multipart/form-data" method="post">
         <input type="hidden" name="MAX_FILE_SIZE" value="3000000" />
         <input type="file" accept=".png" id="image" name="image"><br>
-        <input type="submit" value="upload"/>
+        <input type="submit" value="Upload" />
+        <a id="link" href="#" style="display: none;">Download het plaatje</a>
     </form>
 
     <script src="appImg.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js"></script>
+
 </body>
 </html>
